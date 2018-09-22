@@ -4,6 +4,7 @@ using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands;
+using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
 {

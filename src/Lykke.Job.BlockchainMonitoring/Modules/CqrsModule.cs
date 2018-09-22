@@ -7,7 +7,6 @@ using Lykke.Cqrs.Configuration;
 using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
 using Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout;
-using Lykke.Job.BlockchainMonitoring.Workflow.Commands;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 using Lykke.Job.BlockchainMonitoring.Workflow.Sagas;
 using Lykke.Messaging;
