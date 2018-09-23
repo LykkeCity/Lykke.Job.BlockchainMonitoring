@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
-using Lykke.Job.BlockchainMonitoring.Workflow.Commands;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
@@ -11,18 +10,18 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class RegisterCashoutDurationCommandCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IMetricPublishAdapter _metricPublishAdapter;
+        private readonly IMetricPublishFacade _metricPublishFacade;
 
-        public RegisterCashoutDurationCommandCommandHandler(IChaosKitty chaosKitty, IMetricPublishAdapter metricPublishAdapter)
+        public RegisterCashoutDurationCommandCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
         {
             _chaosKitty = chaosKitty;
-            _metricPublishAdapter = metricPublishAdapter;
+            _metricPublishFacade = metricPublishFacade;
         }
 
         [UsedImplicitly]
-        public Task<CommandHandlingResult> Handle(RegisterCashoutDurationCommand command, IEventPublisher publisher)
+        public async Task<CommandHandlingResult> Handle(RegisterCashoutDurationCommand command, IEventPublisher publisher)
         {
-            _metricPublishAdapter.PublishGauge("duration_finished_seconds",
+            await _metricPublishFacade.PublishGaugeAsync(MetricGaugeType.DurationSeconds,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId,
@@ -30,7 +29,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
 
             _chaosKitty.Meow(command.OperationId);
 
-            return Task.FromResult(CommandHandlingResult.Ok());
+            return CommandHandlingResult.Ok();
         }
     }
 }

@@ -10,38 +10,38 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class RegisterCashoutResultCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IMetricPublishAdapter _metricPublishAdapter;
+        private readonly IMetricPublishFacade _metricPublishFacade;
 
-        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetricPublishAdapter metricPublishAdapter)
+        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
         {
             _chaosKitty = chaosKitty;
-            _metricPublishAdapter = metricPublishAdapter;
+            _metricPublishFacade = metricPublishFacade;
         }
 
         [UsedImplicitly]
-        public Task<CommandHandlingResult> Handle(RegisterCashoutFailedCommand command, IEventPublisher publisher)
+        public async Task<CommandHandlingResult> Handle(RegisterCashoutFailedCommand command, IEventPublisher publisher)
         {
-            _metricPublishAdapter.IncrementCounter("fail",
+            await _metricPublishFacade.IncrementCounterAsync(MetricCounterType.Fail,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);
 
             _chaosKitty.Meow(command.OperationId);
 
-            return Task.FromResult(CommandHandlingResult.Ok());
+            return CommandHandlingResult.Ok();
         }
 
         [UsedImplicitly]
-        public Task<CommandHandlingResult> Handle(RegisterCashoutCompletedCommand command, IEventPublisher publisher)
+        public async Task<CommandHandlingResult> Handle(RegisterCashoutCompletedCommand command, IEventPublisher publisher)
         {
-            _metricPublishAdapter.IncrementCounter("completed",
+            await _metricPublishFacade.IncrementCounterAsync(MetricCounterType.Completed,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);
 
             _chaosKitty.Meow(command.OperationId);
 
-            return Task.FromResult(CommandHandlingResult.Ok());
+            return CommandHandlingResult.Ok();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac;
 using Common;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
@@ -18,7 +19,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
             _metricPusher = metricPusher;
         }
 
-        public void PublishGauge(string metricName, 
+        public Task PublishGaugeAsync(MetricGaugeType metricType, 
             string assetId,
             MetricOperationType operationType, 
             Guid operationId, 
@@ -30,7 +31,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 .ToArray();
 
             var gauge = Metrics.CreateGauge(
-                name: $"bil_{operationType.ToString().ToLower()}_{metricName}", 
+                name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}", 
                 help: $"{operationId.ToString().ToLower()}-operation for {operationId}",
                 configuration: new GaugeConfiguration
                 {
@@ -40,12 +41,11 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
 
             gauge.WithLabels(labels.Select(p => p.Value).ToArray())
                 .Set(metricValue);
-            
 
-            gauge.Publish();
+            return Task.CompletedTask;
         }
 
-        public void IncrementCounter(string metricName, 
+        public Task IncrementCounterAsync(MetricCounterType metricType, 
             string assetId,
             MetricOperationType operationType, 
             Guid operationId,
@@ -56,7 +56,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 .ToArray();
             
             var counter = Metrics.CreateCounter(
-                name: $"bil-{operationType.ToString().ToLower()}-{metricName}",
+                name: $"bil-{operationType.ToString().ToLower()}-{metricType.ToString().ToLower()}",
                 help: $"{operationId.ToString().ToLower()}-operation for {operationId}",
                 configuration: new CounterConfiguration
                 {
@@ -65,6 +65,8 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 });
 
             counter.WithLabels(labels.Select(p => p.Value).ToArray()).Inc();
+
+            return Task.CompletedTask;
         }
 
         public void Start()

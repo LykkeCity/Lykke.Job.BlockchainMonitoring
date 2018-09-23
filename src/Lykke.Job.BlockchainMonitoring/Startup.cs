@@ -103,7 +103,7 @@ namespace Lykke.Job.BlockchainMonitoring
                         appSettings.BlockchainMonitoringJob.ChaosKitty),
                     new ServiceModule(appSettings.BlockchainMonitoringJob), 
                     new RepositoriesModule(settingsManager.Nested(p => p.BlockchainMonitoringJob.Db)), 
-                    new CqrsModule(appSettings.BlockchainMonitoringJob.Cqrs) 
+                    new CqrsModule(appSettings.BlockchainMonitoringJob.Cqrs, "debug") 
                 };
 
                 foreach (var module in modules)

@@ -25,6 +25,9 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                 .As<IStartable>()
                 .As<IStopable>()
                 .SingleInstance();
+
+            builder.RegisterType<MetricPublishFacade>()
+                .As<IMetricPublishFacade>();
         }
     }
 }
