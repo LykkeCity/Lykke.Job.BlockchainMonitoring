@@ -6,7 +6,7 @@ using Lykke.Job.BlockchainMonitoring.Domain.Services;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
-{
+{ 
     public class RegisterCashoutDurationCommandCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;

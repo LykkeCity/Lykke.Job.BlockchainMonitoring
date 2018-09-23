@@ -56,7 +56,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 .ToArray();
             
             var counter = Metrics.CreateCounter(
-                name: $"bil-{operationType.ToString().ToLower()}-{metricType.ToString().ToLower()}",
+                name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}",
                 help: $"{operationId.ToString().ToLower()}-operation for {operationId}",
                 configuration: new CounterConfiguration
                 {

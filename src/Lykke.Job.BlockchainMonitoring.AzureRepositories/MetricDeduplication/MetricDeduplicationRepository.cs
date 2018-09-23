@@ -46,8 +46,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication
         {
             return $"{operationId:D}";
         }
-
-
+        
         private string BuildPartitionKey(Enum metricType, Guid operationId)
         {
             return $"{metricType}_{operationId.ToString().CalculateHexHash32(3)}";
