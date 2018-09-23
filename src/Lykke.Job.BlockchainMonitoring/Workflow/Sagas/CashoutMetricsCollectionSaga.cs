@@ -69,17 +69,6 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
 
                 _chaosKitty.Meow(evt.OperationId);
 
-                sender.SendCommand(new RegisterCashoutDurationCommand
-                    {
-                        AssetId = evt.AssetId,
-                        OperationId = aggregate.OperationId,
-                        Started = aggregate.StartMoment,
-                        Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
-                    },
-                    BoundedContext);
-
-                _chaosKitty.Meow(evt.OperationId);
-
                 sender.SendCommand(new RegisterCashoutCompletedCommand
                     {
                         AssetId = evt.AssetId,
