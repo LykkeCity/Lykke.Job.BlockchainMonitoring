@@ -101,6 +101,11 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
              .On(defaultRoute)
              .WithCommandsHandler<RegisterCashoutResultCommandHandler>()
 
+
+             .ListeningCommands(typeof(RegisterCashoutDurationCommand))
+             .On(defaultRoute)
+             .WithCommandsHandler<RegisterCashoutDurationCommandHandler>()
+
              .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
              .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 

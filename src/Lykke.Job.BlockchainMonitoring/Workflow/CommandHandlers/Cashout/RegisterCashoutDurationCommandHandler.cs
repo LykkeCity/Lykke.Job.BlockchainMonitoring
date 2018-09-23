@@ -7,12 +7,12 @@ using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
 { 
-    public class RegisterCashoutDurationCommandCommandHandler
+    public class RegisterCashoutDurationCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
         private readonly IMetricPublishFacade _metricPublishFacade;
 
-        public RegisterCashoutDurationCommandCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
+        public RegisterCashoutDurationCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
         {
             _chaosKitty = chaosKitty;
             _metricPublishFacade = metricPublishFacade;
