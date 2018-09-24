@@ -32,7 +32,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
 
             var gauge = Metrics.CreateGauge(
                 name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}", 
-                help: $"{operationId.ToString().ToLower()}-operation for {operationId}",
+                help: $"measuring {metricType.ToString().ToLower()} for {operationType.ToString().ToLower()}-operation",
                 configuration: new GaugeConfiguration
                 {
                     SuppressInitialValue = false,
@@ -57,7 +57,7 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
             
             var counter = Metrics.CreateCounter(
                 name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}",
-                help: $"{operationId.ToString().ToLower()}-operation for {operationId}",
+                help: $"measuring {metricType.ToString().ToLower()} for {operationType.ToString().ToLower()}-operation",
                 configuration: new CounterConfiguration
                 {
                     SuppressInitialValue = false,
