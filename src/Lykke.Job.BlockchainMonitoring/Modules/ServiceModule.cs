@@ -26,8 +26,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                 .As<IStopable>()
                 .SingleInstance();
 
-            builder.RegisterType<MetrickPublishAdapterWithDeduplication>()
-                .As<IMetrickPublishAdapterWithDeduplication>();
+            builder.RegisterType<MetricPublishAdapterWithDeduplication>()
+                .As<IMetricPublishAdapterWithDeduplication>();
         }
     }
 }

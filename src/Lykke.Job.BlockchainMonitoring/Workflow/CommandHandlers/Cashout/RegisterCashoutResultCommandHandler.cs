@@ -10,18 +10,18 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class RegisterCashoutResultCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IMetrickPublishAdapterWithDeduplication _metrickPublishAdapterWithDeduplication;
+        private readonly IMetricPublishAdapterWithDeduplication _metricPublishAdapterWithDeduplication;
 
-        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetrickPublishAdapterWithDeduplication metrickPublishAdapterWithDeduplication)
+        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetricPublishAdapterWithDeduplication metricPublishAdapterWithDeduplication)
         {
             _chaosKitty = chaosKitty;
-            _metrickPublishAdapterWithDeduplication = metrickPublishAdapterWithDeduplication;
+            _metricPublishAdapterWithDeduplication = metricPublishAdapterWithDeduplication;
         }
 
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(RegisterCashoutFailedCommand command, IEventPublisher publisher)
         {
-            await _metrickPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Fail,
+            await _metricPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Fail,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);
@@ -34,7 +34,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(RegisterCashoutCompletedCommand command, IEventPublisher publisher)
         {
-            await _metrickPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Completed,
+            await _metricPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Completed,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);
