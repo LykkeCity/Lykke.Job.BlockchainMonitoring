@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.SettingsReader.Attributes;
 
@@ -17,5 +18,8 @@ namespace Lykke.Job.BlockchainMonitoring.Settings.JobSettings
         [Optional]
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public ChaosSettings ChaosKitty { get; set; }
+        
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public ActiveOperationsSettings ActiveOperations { get; set; }
     }
 }

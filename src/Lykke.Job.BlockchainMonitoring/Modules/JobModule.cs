@@ -1,40 +1,27 @@
 ﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Common;
-using Common.Log;
 using Lykke.Common.Chaos;
+using Lykke.Common.Log;
+using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Services;
 using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
+using Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers;
 using Lykke.Sdk;
 using Lykke.Sdk.Health;
-using Lykke.SettingsReader;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Job.BlockchainMonitoring.Modules
 {
     public class JobModule : Module
     {
         private readonly BlockchainMonitoringJobSettings _settings;
-        private readonly IReloadingManager<BlockchainMonitoringJobSettings> _settingsManager;
-        private readonly ChaosSettings _chaosSettings;
 
-        public JobModule(BlockchainMonitoringJobSettings settings,
-            IReloadingManager<BlockchainMonitoringJobSettings> settingsManager,
-            ChaosSettings chaosSettings)
+        public JobModule(BlockchainMonitoringJobSettings settings)
         {
             _settings = settings;
-            _settingsManager = settingsManager;
-            _chaosSettings = chaosSettings;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            // NOTE: Do not register entire settings in container, pass necessary settings to services which requires them
-            // ex:
-            // builder.RegisterType<QuotesPublisher>()
-            //  .As<IQuotesPublisher>()
-            //  .WithParameter(TypedParameter.From(_settings.Rabbit.ConnectionString))
-
             builder.RegisterType<HealthService>()
                 .As<IHealthService>()
                 .SingleInstance();
@@ -48,9 +35,23 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                 .AutoActivate()
                 .SingleInstance();
 
-            // TODO: Add your dependencies here
+            builder.RegisterChaosKitty(_settings.ChaosKitty);
 
-            builder.RegisterChaosKitty(_chaosSettings);
+            builder.Register(p => new FinishedOperationsCleanupPeriodicalHandler(
+                    timerPeriod: _settings.ActiveOperations.CleanupTimerPeriod, 
+                    operationAgeToCleanup: _settings.ActiveOperations.OperationAgeToCleanup,
+                    logFactory: p.Resolve<ILogFactory>(), 
+                    activeOperationsRepository: p.Resolve<IActiveOperationsRepository>()))
+                .As<IStartable>()
+                .As<IStopable>()
+                .SingleInstance();
+
+
+            builder.RegisterType<RegisterUnfinishedOperationDurationPeriodicalHandler>()
+                .WithParameter(TypedParameter.From(_settings.ActiveOperations.RegisterUnifinishedOperationDurationTimerPeriod))
+                .As<IStartable>()
+                .As<IStopable>()
+                .SingleInstance();
         }
     }
 }

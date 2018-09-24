@@ -5,7 +5,6 @@ using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
-using Lykke.Job.BlockchainMonitoring.Workflow.Commands;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
@@ -42,6 +41,14 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                         OperationId = aggregate.OperationId
                     },
                     BoundedContext);
+
+
+                sender.SendCommand(new SetActiveOperationCommand
+                {
+                    OperationId = aggregate.OperationId,
+                    AssetId = aggregate.AssetId,
+                    StartedAt = aggregate.StartMoment
+                }, BoundedContext);
             }
         }
 
@@ -75,6 +82,14 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                         OperationId = aggregate.OperationId
                     }, BoundedContext);
 
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                sender.SendCommand(new SetActiveOperationFinishedCommand
+                {
+                    OperationId = aggregate.OperationId
+                }, BoundedContext);
+
                 await _repository.SaveAsync(aggregate);
             }
         }
@@ -106,6 +121,13 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                 sender.SendCommand(new RegisterCashoutFailedCommand
                 {
                     AssetId = evt.AssetId,
+                    OperationId = aggregate.OperationId
+                }, BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                sender.SendCommand(new SetActiveOperationFinishedCommand
+                {
                     OperationId = aggregate.OperationId
                 }, BoundedContext);
 

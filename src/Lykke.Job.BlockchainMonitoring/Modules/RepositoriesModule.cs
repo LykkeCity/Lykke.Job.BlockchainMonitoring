@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Lykke.Common.Log;
+using Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations;
 using Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollection;
 using Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
@@ -31,6 +32,12 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                     _dbSettings.Nested(x => x.DataConnString),
                     p.Resolve<ILogFactory>()))
                 .As<IMetricDeduplicationRepository>()
+                .SingleInstance();
+
+            builder.Register(p => ActiveOperationsRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<IActiveOperationsRepository>()
                 .SingleInstance();
         }
     }
