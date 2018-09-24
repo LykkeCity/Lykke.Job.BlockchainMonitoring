@@ -5,12 +5,12 @@ using Lykke.Job.BlockchainMonitoring.Domain.Services;
 
 namespace Lykke.Job.BlockchainMonitoring.DomainServices
 {
-    public class MetricPublishFacade:IMetricPublishFacade
+    public class MetrickPublishAdapterWithDeduplication:IMetrickPublishAdapterWithDeduplication
     {
         private readonly IMetricPublishAdapter _adapter;
         private readonly IMetricDeduplicationRepository _deduplicationRepository;
 
-        public MetricPublishFacade(IMetricPublishAdapter adapter, IMetricDeduplicationRepository deduplicationRepository)
+        public MetrickPublishAdapterWithDeduplication(IMetricPublishAdapter adapter, IMetricDeduplicationRepository deduplicationRepository)
         {
             _adapter = adapter;
             _deduplicationRepository = deduplicationRepository;

@@ -11,18 +11,18 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class RegisterCashoutAmountCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IMetricPublishFacade _metricPublishFacade;
+        private readonly IMetrickPublishAdapterWithDeduplication _metrickPublishAdapterWithDeduplication;
 
-        public RegisterCashoutAmountCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
+        public RegisterCashoutAmountCommandHandler(IChaosKitty chaosKitty, IMetrickPublishAdapterWithDeduplication metrickPublishAdapterWithDeduplication)
         {
             _chaosKitty = chaosKitty;
-            _metricPublishFacade = metricPublishFacade;
+            _metrickPublishAdapterWithDeduplication = metrickPublishAdapterWithDeduplication;
         }
 
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(RegisterCashoutAmountCommand command, IEventPublisher publisher)
         {
-            await _metricPublishFacade.PublishGaugeAsync(MetricGaugeType.Amount,
+            await _metrickPublishAdapterWithDeduplication.PublishGaugeAsync(MetricGaugeType.Amount,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId,

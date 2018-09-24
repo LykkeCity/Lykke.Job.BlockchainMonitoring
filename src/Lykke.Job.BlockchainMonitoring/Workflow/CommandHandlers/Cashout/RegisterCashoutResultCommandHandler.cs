@@ -10,18 +10,18 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class RegisterCashoutResultCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IMetricPublishFacade _metricPublishFacade;
+        private readonly IMetrickPublishAdapterWithDeduplication _metrickPublishAdapterWithDeduplication;
 
-        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetricPublishFacade metricPublishFacade)
+        public RegisterCashoutResultCommandHandler(IChaosKitty chaosKitty, IMetrickPublishAdapterWithDeduplication metrickPublishAdapterWithDeduplication)
         {
             _chaosKitty = chaosKitty;
-            _metricPublishFacade = metricPublishFacade;
+            _metrickPublishAdapterWithDeduplication = metrickPublishAdapterWithDeduplication;
         }
 
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(RegisterCashoutFailedCommand command, IEventPublisher publisher)
         {
-            await _metricPublishFacade.IncrementCounterAsync(MetricCounterType.Fail,
+            await _metrickPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Fail,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);
@@ -34,7 +34,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(RegisterCashoutCompletedCommand command, IEventPublisher publisher)
         {
-            await _metricPublishFacade.IncrementCounterAsync(MetricCounterType.Completed,
+            await _metrickPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Completed,
                 command.AssetId,
                 MetricOperationType.Cashout,
                 command.OperationId);

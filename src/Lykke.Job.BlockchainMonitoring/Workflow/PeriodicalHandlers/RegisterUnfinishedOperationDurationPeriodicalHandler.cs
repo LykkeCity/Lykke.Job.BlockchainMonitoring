@@ -14,15 +14,15 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
     {
         private readonly ITimerTrigger _timer;
         private readonly IActiveOperationsRepository _activeOperationsRepository;
-        private readonly IMetricPublishFacade _metricPublishFacade;
+        private readonly IMetricPublishAdapter _metrickPublishAdapter;
 
         public RegisterUnfinishedOperationDurationPeriodicalHandler(IActiveOperationsRepository activeOperationsRepository, 
             TimeSpan timerPeriod, 
-            ILogFactory logFactory, 
-            IMetricPublishFacade metricPublishFacade)
+            ILogFactory logFactory,
+            IMetricPublishAdapter metrickPublishAdapter)
         {
             _activeOperationsRepository = activeOperationsRepository;
-            _metricPublishFacade = metricPublishFacade;
+            _metrickPublishAdapter = metrickPublishAdapter;
 
             _timer = new TimerTrigger(
                 nameof(FinishedOperationsCleanupPeriodicalHandler),
@@ -52,18 +52,23 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
             TimerTriggeredHandlerArgs args,
             CancellationToken cancellationToken)
         {
-            var activeOperations = (await _activeOperationsRepository.GetAllAsync()).Where(p => !p.finished).ToList();
+            var activeOperations = (await _activeOperationsRepository.GetAllAsync()).ToList();
 
             foreach (var operationsByAssetId in activeOperations.GroupBy(p => p.assetId))
             {
-                var longestOperation = operationsByAssetId.OrderBy(p => p.startedAt).First();
+                var longestOperation = operationsByAssetId.OrderByDescending(p => GetUnfinishedDuration(p.startedAt, p.finished)).First();
 
-                await _metricPublishFacade.PublishGaugeAsync(MetricGaugeType.UnfinishedDurationSeconds,
+                await _metrickPublishAdapter.PublishGaugeAsync(MetricGaugeType.UnfinishedDurationSeconds,
                     longestOperation.assetId,
                     MetricOperationType.Cashout,
                     longestOperation.operationId,
-                    (DateTime.UtcNow - longestOperation.startedAt).TotalSeconds);
+                    GetUnfinishedDuration(longestOperation.startedAt, longestOperation.finished).TotalSeconds);
             }
+        }
+
+        private TimeSpan GetUnfinishedDuration(DateTime startedAt, bool finished)
+        {
+            return finished ? TimeSpan.Zero: DateTime.UtcNow - startedAt;
         }
     }
 }
