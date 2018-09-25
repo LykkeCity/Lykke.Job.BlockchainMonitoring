@@ -21,7 +21,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication
         public static IMetricDeduplicationRepository Create(IReloadingManager<string> connStringManager, ILogFactory logFactory)
         {
             return new MetricDeduplicationRepository(AzureTableStorage<MetricDeduplicationEntity>.Create(connStringManager, 
-                "MetricDeduplications", 
+                "MonitoringMetricDeduplications", 
                 logFactory));
         }
 

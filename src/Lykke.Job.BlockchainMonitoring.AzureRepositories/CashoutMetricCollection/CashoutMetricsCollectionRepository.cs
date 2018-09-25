@@ -19,7 +19,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollecti
         {
             var storage = AzureTableStorage<CashoutMetricsCollectionEntity>.Create(
                 connectionString,
-                "CashoutMetricsCollections",
+                "MonitoringCashoutMetricsCollections",
                 log);
 
             return new CashoutMetricsCollectionRepository(storage);

@@ -22,7 +22,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 
         public static IActiveOperationsRepository Create(IReloadingManager<string> connStringManager, ILogFactory logFactory)
         {
-            return new ActiveOperationsRepository(AzureTableStorage<ActiveOperationEntity>.Create(connStringManager, "ActiveOperation", logFactory));
+            return new ActiveOperationsRepository(AzureTableStorage<ActiveOperationEntity>.Create(connStringManager, "MonitoringActiveOperation", logFactory));
         }
 
         public async Task InsertAsync(Guid operationId, string assetId, DateTime startedAt)
