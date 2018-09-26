@@ -97,7 +97,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
              .On(defaultRoute)
              .WithCommandsHandler<RegisterCashoutAmountCommandHandler>()
              
-             .ListeningCommands(typeof(RegisterCashoutFailedCommand), typeof(RegisterCashoutCompletedCommand))
+             .ListeningCommands(typeof(RegisterCashoutFailedCommand), 
+                 typeof(RegisterCashoutCompletedCommand))
              .On(defaultRoute)
              .WithCommandsHandler<RegisterCashoutResultCommandHandler>()
 
@@ -115,6 +116,10 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
              .On(defaultRoute)
              .WithCommandsHandler<SetActiveOperationFinishedCommandHandler>()
 
+             .ListeningCommands(typeof(SetLastFinishedCashoutMomentCommand))
+             .On(defaultRoute)
+             .WithCommandsHandler<SetLastFinishedCashoutMomentCommandHandler>()
+
              .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
              .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 
@@ -123,21 +128,28 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent))
              .From(BlockchainCashoutProcessorBoundedContext.Name)
              .On(defaultRoute)
-             .PublishingCommands(typeof(RegisterCashoutAmountCommand), typeof(SetActiveOperationCommand))
+             .PublishingCommands(typeof(RegisterCashoutAmountCommand), 
+                 typeof(SetActiveOperationCommand))
              .To(CashoutMetricsCollectionSaga.BoundedContext)
              .With(commandsPipeline)
 
              .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
              .From(BlockchainCashoutProcessorBoundedContext.Name)
              .On(defaultRoute)
-             .PublishingCommands(typeof(RegisterCashoutDurationCommand), typeof(RegisterCashoutCompletedCommand), typeof(SetActiveOperationFinishedCommand))
+             .PublishingCommands(typeof(RegisterCashoutDurationCommand), 
+                 typeof(RegisterCashoutCompletedCommand),
+                 typeof(SetActiveOperationFinishedCommand), 
+                 typeof(SetLastFinishedCashoutMomentCommand))
              .To(CashoutMetricsCollectionSaga.BoundedContext)
              .With(commandsPipeline)
 
              .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent))
              .From(BlockchainCashoutProcessorBoundedContext.Name)
              .On(defaultRoute)
-             .PublishingCommands(typeof(RegisterCashoutDurationCommand), typeof(RegisterCashoutFailedCommand), typeof(SetActiveOperationFinishedCommand))
+             .PublishingCommands(typeof(RegisterCashoutDurationCommand), 
+                 typeof(RegisterCashoutFailedCommand), 
+                 typeof(SetActiveOperationFinishedCommand), 
+                 typeof(SetLastFinishedCashoutMomentCommand))
              .To(CashoutMetricsCollectionSaga.BoundedContext)
              .With(commandsPipeline)
          );

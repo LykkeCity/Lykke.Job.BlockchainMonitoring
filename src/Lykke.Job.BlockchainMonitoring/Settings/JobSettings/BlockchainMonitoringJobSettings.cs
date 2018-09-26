@@ -7,6 +7,7 @@ namespace Lykke.Job.BlockchainMonitoring.Settings.JobSettings
 {
     public class BlockchainMonitoringJobSettings
     {
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public DbSettings Db { get; set; }
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]

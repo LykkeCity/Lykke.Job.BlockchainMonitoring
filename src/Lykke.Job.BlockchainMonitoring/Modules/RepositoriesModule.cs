@@ -2,6 +2,7 @@
 using Lykke.Common.Log;
 using Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations;
 using Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollection;
+using Lykke.Job.BlockchainMonitoring.AzureRepositories.LastFinishedCashoutMoment;
 using Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
@@ -39,6 +40,13 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                     p.Resolve<ILogFactory>()))
                 .As<IActiveOperationsRepository>()
                 .SingleInstance();
+
+            builder.Register(p => LastFinishedCashoutMomentRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<ILastFinishedCashoutMomentRepository>()
+                .SingleInstance();
+            
         }
     }
 }

@@ -3,7 +3,7 @@ using Lykke.AzureStorage.Tables;
 
 namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication
 {
-    public class MetricDeduplicationEntity:AzureTableEntity
+    internal class MetricDeduplicationEntity:AzureTableEntity
     {
         public Guid OperationId { get; set; }
 

@@ -52,6 +52,14 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                 .As<IStartable>()
                 .As<IStopable>()
                 .SingleInstance();
+
+
+
+            builder.RegisterType<RegisterDurationFromLastFinishedCashoutPeriodicalHandler>()
+                .WithParameter(TypedParameter.From(_settings.ActiveOperations.RegisterUnifinishedOperationDurationTimerPeriod))
+                .As<IStartable>()
+                .As<IStopable>()
+                .SingleInstance();
         }
     }
 }

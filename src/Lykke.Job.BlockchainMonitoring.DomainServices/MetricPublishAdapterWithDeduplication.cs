@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
 
@@ -9,11 +10,14 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
     {
         private readonly IMetricPublishAdapter _adapter;
         private readonly IMetricDeduplicationRepository _deduplicationRepository;
+        private readonly SemaphoreSlim _semaphoreSlim;
 
-        public MetricPublishAdapterWithDeduplication(IMetricPublishAdapter adapter, IMetricDeduplicationRepository deduplicationRepository)
+        public MetricPublishAdapterWithDeduplication(IMetricPublishAdapter adapter, 
+            IMetricDeduplicationRepository deduplicationRepository)
         {
             _adapter = adapter;
             _deduplicationRepository = deduplicationRepository;
+            _semaphoreSlim = new SemaphoreSlim(1, 1);
         }
 
         public async Task PublishGaugeAsync(MetricGaugeType metricType, 
@@ -43,11 +47,20 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
 
         private async Task ExecuteAsync(Guid operationId, Enum metricType, Func<Task> publishFunc)
         {
-            if (!await _deduplicationRepository.IsExistsAsync(operationId, metricType))
+            try
             {
-                await publishFunc();
+                await _semaphoreSlim.WaitAsync();
 
-                await _deduplicationRepository.InsertOrReplaceAsync(operationId, metricType);
+                if (!await _deduplicationRepository.IsExistsAsync(operationId, metricType))
+                {
+                    await publishFunc();
+
+                    await _deduplicationRepository.InsertOrReplaceAsync(operationId, metricType);
+                }
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
         }
     }

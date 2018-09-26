@@ -58,7 +58,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
             {
                 var longestOperation = operationsByAssetId.OrderByDescending(p => GetUnfinishedDuration(p.startedAt, p.finished)).First();
 
-                await _metrickPublishAdapter.PublishGaugeAsync(MetricGaugeType.UnfinishedDurationSeconds,
+                await _metrickPublishAdapter.PublishGaugeAsync(MetricGaugeType.MaxUnfinishedDurationSeconds,
                     longestOperation.assetId,
                     MetricOperationType.Cashout,
                     longestOperation.operationId,

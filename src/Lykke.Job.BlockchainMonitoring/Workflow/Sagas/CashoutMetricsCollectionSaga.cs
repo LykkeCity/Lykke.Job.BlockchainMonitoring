@@ -90,6 +90,16 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     OperationId = aggregate.OperationId
                 }, BoundedContext);
 
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                sender.SendCommand(new SetLastFinishedCashoutMomentCommand
+                {
+                    OperationId = aggregate.OperationId,
+                    AssetId = aggregate.AssetId,
+                    Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
+                }, BoundedContext);
+
                 await _repository.SaveAsync(aggregate);
             }
         }
@@ -129,6 +139,15 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                 sender.SendCommand(new SetActiveOperationFinishedCommand
                 {
                     OperationId = aggregate.OperationId
+                }, BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                sender.SendCommand(new SetLastFinishedCashoutMomentCommand
+                {
+                    OperationId = aggregate.OperationId,
+                    AssetId = aggregate.AssetId,
+                    Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
                 }, BoundedContext);
 
                 await _repository.SaveAsync(aggregate);

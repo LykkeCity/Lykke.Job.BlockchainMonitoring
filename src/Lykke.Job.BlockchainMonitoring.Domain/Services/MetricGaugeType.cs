@@ -7,7 +7,8 @@ namespace Lykke.Job.BlockchainMonitoring.Domain.Services
     public enum MetricGaugeType
     {
         Amount,
-        UnfinishedDurationSeconds,
-        FinishedDurationSeconds
+        MaxUnfinishedDurationSeconds,
+        FinishedDurationSeconds,
+        DurationFromLastFinishedCashoutSeconds
     }
 }
