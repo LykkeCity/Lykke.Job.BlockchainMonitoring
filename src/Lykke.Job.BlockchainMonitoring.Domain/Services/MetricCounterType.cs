@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lykke.Job.BlockchainMonitoring.Domain.Services
+﻿namespace Lykke.Job.BlockchainMonitoring.Domain.Services
 {
     public enum MetricCounterType
     {
+        [PrometheusName("fail_total")]
         Fail,
+
+        [PrometheusName("completed_total")]
         Completed
     }
 }

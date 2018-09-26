@@ -31,8 +31,8 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 .ToArray();
 
             var gauge = Metrics.CreateGauge(
-                name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}", 
-                help: $"measuring {metricType.ToString().ToLower()} for {operationType.ToString().ToLower()}-operation",
+                name: $"bil_{operationType.ToString().ToLower()}_{GetMetricName(metricType)}",
+                help: $"measuring {GetMetricName(metricType)} for {operationType.ToString().ToLower()}-operation",
                 configuration: new GaugeConfiguration
                 {
                     SuppressInitialValue = false,
@@ -56,8 +56,8 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
                 .ToArray();
             
             var counter = Metrics.CreateCounter(
-                name: $"bil_{operationType.ToString().ToLower()}_{metricType.ToString().ToLower()}",
-                help: $"measuring {metricType.ToString().ToLower()} for {operationType.ToString().ToLower()}-operation",
+                name: $"bil_{operationType.ToString().ToLower()}_{GetMetricName(metricType)}",
+                help: $"measuring {GetMetricName(metricType)} for {operationType.ToString().ToLower()}-operation",
                 configuration: new CounterConfiguration
                 {
                     SuppressInitialValue = false,
@@ -82,6 +82,18 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
         public void Stop()
         {
             _metricPusher.Stop();
+        }
+
+        public static string GetMetricName(Enum value)
+        {
+            var fi = value.GetType().GetField(value.ToString());
+
+            var attributes =
+                (PrometheusName[])fi.GetCustomAttributes(
+                    typeof(PrometheusName),
+                    false);
+
+            return attributes.Length > 0 ? attributes[0].Name : value.ToString();
         }
     }
 }

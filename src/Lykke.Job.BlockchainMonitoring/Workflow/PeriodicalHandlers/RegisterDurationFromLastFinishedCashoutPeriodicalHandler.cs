@@ -56,7 +56,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
 
             foreach (var lastCashout in all)
             {
-                await _metricPublishAdapter.PublishGaugeAsync(MetricGaugeType.DurationFromLastFinishedCashoutSeconds,
+                await _metricPublishAdapter.PublishGaugeAsync(MetricGaugeType.DurationFromLastFinishSeconds,
                     lastCashout.assetId,
                     MetricOperationType.Cashout,
                     lastCashout.operationId, (now - lastCashout.lastFinishedCashoutMoment).TotalSeconds);
