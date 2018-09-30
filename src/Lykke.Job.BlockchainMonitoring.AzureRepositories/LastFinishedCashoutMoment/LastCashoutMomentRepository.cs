@@ -11,37 +11,38 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.LastFinishedCashoutMoment
 {
-    public class LastFinishedCashoutMomentRepository: ILastFinishedCashoutMomentRepository
+    public class LastCashoutMomentRepository: ILastCashoutMomentRepository
     {
-        private readonly INoSQLTableStorage<LastFinishedCashoutMomentEntity> _storage;
+        private readonly INoSQLTableStorage<LastCashoutMomentEntity> _storage;
 
-        private LastFinishedCashoutMomentRepository(INoSQLTableStorage<LastFinishedCashoutMomentEntity> storage)
+        private LastCashoutMomentRepository(INoSQLTableStorage<LastCashoutMomentEntity> storage)
         {
             _storage = storage;
         }
 
-        public static ILastFinishedCashoutMomentRepository Create(
+        public static ILastCashoutMomentRepository Create(
             IReloadingManager<string> connectionString,
             ILogFactory log)
         {
-            var storage = AzureTableStorage<LastFinishedCashoutMomentEntity>.Create(
+            var storage = AzureTableStorage<LastCashoutMomentEntity>.Create(
                 connectionString,
-                "MonitoringLastFinishedCashoutMoments",
+                "MonitoringLastCashoutMoments",
                 log);
 
-            return new LastFinishedCashoutMomentRepository(storage);
+            return new LastCashoutMomentRepository(storage);
         }
         
-        public async Task<IEnumerable<(string assetId, DateTime lastFinishedCashoutMoment, Guid operationId)>> GetAllAsync()
+        public async Task<IEnumerable<(string assetId, string assetMetricId, DateTime moment, Guid operationId)>> GetAllAsync()
         {
-            return (await _storage.GetDataAsync()).Select(p => (p.AssetId, p.Moment, p.OperationId));
+            return (await _storage.GetDataAsync()).Select(p => (p.AssetId, p.AssetMetricId, p.Moment, p.OperationId));
         }
 
-        public Task SetLastMomentAsync(string assetId, DateTime moment, Guid operationId)
+        public Task SetLastMomentAsync(string assetId, string assetMetricId, DateTime moment, Guid operationId)
         {
-            return _storage.InsertOrReplaceAsync(new LastFinishedCashoutMomentEntity
+            return _storage.InsertOrReplaceAsync(new LastCashoutMomentEntity
             {
                 AssetId = assetId,
+                AssetMetricId = assetMetricId,
                 Moment = moment,
                 OperationId = operationId,
                 PartitionKey = BuildPartitionKey(assetId),

@@ -35,16 +35,16 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                 .As<IMetricDeduplicationRepository>()
                 .SingleInstance();
 
-            builder.Register(p => ActiveOperationsRepository.Create(
+            builder.Register(p => ActiveCashoutRepository.Create(
                     _dbSettings.Nested(x => x.DataConnString),
                     p.Resolve<ILogFactory>()))
-                .As<IActiveOperationsRepository>()
+                .As<IActiveCashoutRepository>()
                 .SingleInstance();
 
-            builder.Register(p => LastFinishedCashoutMomentRepository.Create(
+            builder.Register(p => LastCashoutMomentRepository.Create(
                     _dbSettings.Nested(x => x.DataConnString),
                     p.Resolve<ILogFactory>()))
-                .As<ILastFinishedCashoutMomentRepository>()
+                .As<ILastCashoutMomentRepository>()
                 .SingleInstance();
             
         }

@@ -20,13 +20,18 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
         }
 
         public Task PublishGaugeAsync(MetricGaugeType metricType, 
-            string assetId,
+            string assetMetricId,
             MetricOperationType operationType, 
             Guid operationId, 
             double metricValue,
             params KeyValuePair<string, string>[] additionalLabels)
         {
-            var labels = new[] { new KeyValuePair<string, string>(AssetIdLabelName, assetId) }
+            if (string.IsNullOrEmpty(assetMetricId))
+            {
+                throw new ArgumentNullException(nameof(assetMetricId));
+            }
+
+            var labels = new[] { new KeyValuePair<string, string>(AssetIdLabelName, assetMetricId) }
                 .Union(additionalLabels)
                 .ToArray();
 
@@ -46,12 +51,17 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
         }
 
         public Task IncrementCounterAsync(MetricCounterType metricType, 
-            string assetId,
+            string assetMetricId,
             MetricOperationType operationType, 
             Guid operationId,
             params KeyValuePair<string, string>[] additionalLabels)
         {
-            var labels = new[] {new KeyValuePair<string, string>(AssetIdLabelName, assetId)}
+            if (string.IsNullOrEmpty(assetMetricId))
+            {
+                throw new ArgumentNullException(nameof(assetMetricId));
+            }
+
+            var labels = new[] {new KeyValuePair<string, string>(AssetIdLabelName, assetMetricId)}
                 .Union(additionalLabels)
                 .ToArray();
             

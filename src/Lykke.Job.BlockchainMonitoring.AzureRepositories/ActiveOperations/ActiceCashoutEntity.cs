@@ -3,9 +3,11 @@ using Lykke.AzureStorage.Tables;
 
 namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 {
-    internal class ActiveOperationEntity:AzureTableEntity
+    internal class ActiceCashoutEntity:AzureTableEntity
     {
         public string AssetId { get; set; }
+
+        public string AssetMetricId { get; set; }
 
         public Guid OperationId { get; set; }
 

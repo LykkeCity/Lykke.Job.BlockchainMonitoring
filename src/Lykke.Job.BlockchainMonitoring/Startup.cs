@@ -98,7 +98,7 @@ namespace Lykke.Job.BlockchainMonitoring
                 var modules = new IModule[]
                 {
                     new JobModule(appSettings.BlockchainMonitoringJob),
-                    new ServiceModule(appSettings.BlockchainMonitoringJob), 
+                    new ServiceModule(appSettings.BlockchainMonitoringJob, appSettings.AssetsServiceClient), 
                     new RepositoriesModule(settingsManager.Nested(p => p.BlockchainMonitoringJob.Db)), 
                     new CqrsModule(appSettings.BlockchainMonitoringJob.Cqrs) 
                 };

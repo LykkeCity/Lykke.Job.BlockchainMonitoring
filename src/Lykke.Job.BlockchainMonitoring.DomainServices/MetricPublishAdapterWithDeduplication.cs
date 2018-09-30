@@ -21,25 +21,25 @@ namespace Lykke.Job.BlockchainMonitoring.DomainServices
         }
 
         public async Task PublishGaugeAsync(MetricGaugeType metricType, 
-            string assetId,
+            string assetMetricId,
             MetricOperationType operationType, 
             Guid operationId,
             double metricValue, 
             params KeyValuePair<string, string>[] additionalLabels)
         {
             await ExecuteAsync(operationId, metricType, () => _adapter.PublishGaugeAsync(metricType,
-                assetId,
+                assetMetricId,
                 operationType,
                 operationId,
                 metricValue,
                 additionalLabels));
         }
 
-        public async Task IncrementCounterAsync(MetricCounterType metricType, string assetId, MetricOperationType operationType, Guid operationId,
+        public async Task IncrementCounterAsync(MetricCounterType metricType, string assetMetricId, MetricOperationType operationType, Guid operationId,
             params KeyValuePair<string, string>[] additionalLabels)
         {
             await ExecuteAsync(operationId, metricType, () => _adapter.IncrementCounterAsync(metricType,
-                assetId, 
+                assetMetricId, 
                 operationType,
                 operationId,
                 additionalLabels));

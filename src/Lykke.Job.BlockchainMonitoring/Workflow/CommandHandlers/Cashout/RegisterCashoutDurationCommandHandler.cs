@@ -22,7 +22,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
         public async Task<CommandHandlingResult> Handle(RegisterCashoutDurationCommand command, IEventPublisher publisher)
         {
             await _metricPublishAdapterWithDeduplication.PublishGaugeAsync(MetricGaugeType.FinishedDurationSeconds,
-                command.AssetId,
+                command.AssetMetricId,
                 MetricOperationType.Cashout,
                 command.OperationId,
                 (command.Finished - command.Started).TotalSeconds);

@@ -8,24 +8,24 @@ using Lykke.Common.Log;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
 
-namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
+namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
 {
-    public class RegisterUnfinishedOperationDurationPeriodicalHandler : IStopable, IStartable
+    public class RegisterUnfinishedCashoutDurationPeriodicalHandler : IStopable, IStartable
     {
         private readonly ITimerTrigger _timer;
-        private readonly IActiveOperationsRepository _activeOperationsRepository;
+        private readonly IActiveCashoutRepository _activeCashoutRepository;
         private readonly IMetricPublishAdapter _metrickPublishAdapter;
 
-        public RegisterUnfinishedOperationDurationPeriodicalHandler(IActiveOperationsRepository activeOperationsRepository, 
+        public RegisterUnfinishedCashoutDurationPeriodicalHandler(IActiveCashoutRepository activeCashoutRepository, 
             TimeSpan timerPeriod, 
             ILogFactory logFactory,
             IMetricPublishAdapter metrickPublishAdapter)
         {
-            _activeOperationsRepository = activeOperationsRepository;
+            _activeCashoutRepository = activeCashoutRepository;
             _metrickPublishAdapter = metrickPublishAdapter;
 
             _timer = new TimerTrigger(
-                nameof(FinishedOperationsCleanupPeriodicalHandler),
+                nameof(FinishedCashoutCleanupPeriodicalHandler),
                 timerPeriod,
                 logFactory);
             
@@ -52,14 +52,14 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
             TimerTriggeredHandlerArgs args,
             CancellationToken cancellationToken)
         {
-            var activeOperations = (await _activeOperationsRepository.GetAllAsync()).ToList();
+            var activeOperations = (await _activeCashoutRepository.GetAllAsync()).ToList();
 
             foreach (var operationsByAssetId in activeOperations.GroupBy(p => p.assetId))
             {
                 var longestOperation = operationsByAssetId.OrderByDescending(p => GetUnfinishedDuration(p.startedAt, p.finished)).First();
 
                 await _metrickPublishAdapter.PublishGaugeAsync(MetricGaugeType.MaxUnfinishedDurationSeconds,
-                    longestOperation.assetId,
+                    longestOperation.assetMetricId,
                     MetricOperationType.Cashout,
                     longestOperation.operationId,
                     GetUnfinishedDuration(longestOperation.startedAt, longestOperation.finished).TotalSeconds);

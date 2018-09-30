@@ -7,25 +7,25 @@ using Lykke.Common.Log;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
 
-namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
+namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
 {
-    public class RegisterDurationFromLastFinishedCashoutPeriodicalHandler:IStartable, IStopable
+    public class RegisterDurationFromLastCashoutPeriodicalHandler:IStartable, IStopable
     {
         private readonly ITimerTrigger _timer;
         private readonly IMetricPublishAdapter _metricPublishAdapter;
-        private readonly ILastFinishedCashoutMomentRepository _lastMomentRepository;
+        private readonly ILastCashoutMomentRepository _lastMomentRepository;
 
-        public RegisterDurationFromLastFinishedCashoutPeriodicalHandler(
+        public RegisterDurationFromLastCashoutPeriodicalHandler(
             TimeSpan timerPeriod, 
             IMetricPublishAdapter metricPublishAdapter,
             ILogFactory logFactory, 
-            ILastFinishedCashoutMomentRepository lastMomentRepository)
+            ILastCashoutMomentRepository lastMomentRepository)
         {
             _metricPublishAdapter = metricPublishAdapter;
             _lastMomentRepository = lastMomentRepository;
 
             _timer = new TimerTrigger(
-                nameof(FinishedOperationsCleanupPeriodicalHandler),
+                nameof(RegisterDurationFromLastCashoutPeriodicalHandler),
                 timerPeriod,
                 logFactory);
 
@@ -57,9 +57,9 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
             foreach (var lastCashout in all)
             {
                 await _metricPublishAdapter.PublishGaugeAsync(MetricGaugeType.DurationFromLastFinishSeconds,
-                    lastCashout.assetId,
+                    lastCashout.assetMetricId,
                     MetricOperationType.Cashout,
-                    lastCashout.operationId, (now - lastCashout.lastFinishedCashoutMoment).TotalSeconds);
+                    lastCashout.operationId, (now - lastCashout.moment).TotalSeconds);
             }
         }
     }

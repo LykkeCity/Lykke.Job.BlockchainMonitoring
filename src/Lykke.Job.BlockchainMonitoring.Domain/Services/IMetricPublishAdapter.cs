@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Prometheus.Advanced.DataContracts;
 
 namespace Lykke.Job.BlockchainMonitoring.Domain.Services
 {
     public interface IMetricPublishAdapter
     {
         Task PublishGaugeAsync(MetricGaugeType metricType, 
-            string assetId,
+            string assetMetricId,
             MetricOperationType operationType, 
             Guid operationId, 
             double metricValue,
@@ -16,7 +15,7 @@ namespace Lykke.Job.BlockchainMonitoring.Domain.Services
 
 
         Task IncrementCounterAsync(MetricCounterType metricType,
-            string assetId,
+            string assetMetricId,
             MetricOperationType operationType,
             Guid operationId,
             params KeyValuePair<string, string>[] additionalLabels);

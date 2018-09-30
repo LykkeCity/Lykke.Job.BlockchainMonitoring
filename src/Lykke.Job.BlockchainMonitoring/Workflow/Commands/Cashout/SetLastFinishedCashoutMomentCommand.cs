@@ -10,6 +10,8 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout
 
         public string AssetId { get; set; }
 
+        public string AssetMetricId { get; set; }
+
         public DateTime Finished { get; set; }
     }
 }

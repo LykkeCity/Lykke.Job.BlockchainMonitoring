@@ -7,21 +7,21 @@ using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
 {
-    public class SetActiveOperationFinishedCommandHandler
+    public class SetActiveCashoutFinishedCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly IActiveOperationsRepository _activeOperationsRepository;
+        private readonly IActiveCashoutRepository _activeCashoutRepository;
 
-        public SetActiveOperationFinishedCommandHandler(IChaosKitty chaosKitty, IActiveOperationsRepository activeOperationsRepository)
+        public SetActiveCashoutFinishedCommandHandler(IChaosKitty chaosKitty, IActiveCashoutRepository activeCashoutRepository)
         {
             _chaosKitty = chaosKitty;
-            _activeOperationsRepository = activeOperationsRepository;
+            _activeCashoutRepository = activeCashoutRepository;
         }
 
         [UsedImplicitly]
-        public async Task<CommandHandlingResult> Handle(SetActiveOperationFinishedCommand command, IEventPublisher publisher)
+        public async Task<CommandHandlingResult> Handle(SetActiveCashoutFinishedCommand command, IEventPublisher publisher)
         {
-            await _activeOperationsRepository.SetFinishedAsync(command.OperationId);
+            await _activeCashoutRepository.SetFinishedAsync(command.OperationId);
 
             _chaosKitty.Meow(command.OperationId);
 

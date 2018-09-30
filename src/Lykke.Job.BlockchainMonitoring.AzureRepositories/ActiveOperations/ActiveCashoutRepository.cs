@@ -11,26 +11,29 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 {
-    public class ActiveOperationsRepository: IActiveOperationsRepository
+    public class ActiveCashoutRepository: IActiveCashoutRepository
     {
-        private readonly INoSQLTableStorage<ActiveOperationEntity> _storage;
+        private readonly INoSQLTableStorage<ActiceCashoutEntity> _storage;
 
-        private ActiveOperationsRepository(INoSQLTableStorage<ActiveOperationEntity> storage)
+        private ActiveCashoutRepository(INoSQLTableStorage<ActiceCashoutEntity> storage)
         {
             _storage = storage;
         }
 
-        public static IActiveOperationsRepository Create(IReloadingManager<string> connStringManager, ILogFactory logFactory)
+        public static IActiveCashoutRepository Create(IReloadingManager<string> connStringManager, 
+            ILogFactory logFactory)
         {
-            return new ActiveOperationsRepository(AzureTableStorage<ActiveOperationEntity>.Create(connStringManager, "MonitoringActiveOperations", logFactory));
+            return new ActiveCashoutRepository(AzureTableStorage<ActiceCashoutEntity>.Create(connStringManager,
+                "MonitoringActiveCashouts", logFactory));
         }
 
-        public async Task InsertAsync(Guid operationId, string assetId, DateTime startedAt)
+        public async Task InsertAsync(Guid operationId, string assetId, string assetMetricId, DateTime startedAt)
         {
-            await _storage.InsertOrReplaceAsync(new ActiveOperationEntity
+            await _storage.InsertOrReplaceAsync(new ActiceCashoutEntity
             {
                 OperationId = operationId,
                 AssetId = assetId,
+                AssetMetricId = assetMetricId,
                 Finished = false,
                 PartitionKey = BuildPartitionKey(operationId),
                 RowKey = BuildRowKey(operationId),
@@ -38,10 +41,10 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
             }, p => false);
         }
 
-        public async Task<IEnumerable<(Guid operationId, string assetId, DateTime startedAt, bool finished)>> GetAllAsync()
+        public async Task<IEnumerable<(Guid operationId, string assetId, string assetMetricId, DateTime startedAt, bool finished)>> GetAllAsync()
         {
             return (await _storage.GetDataAsync())
-                .Select(p => (p.OperationId, p.AssetId, p.StartedAt, p.Finished));
+                .Select(p => (p.OperationId, p.AssetId, p.AssetMetricId, p.StartedAt, p.Finished));
         }
 
         public Task SetFinishedAsync(Guid operationId)

@@ -6,6 +6,7 @@ using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Services;
 using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
 using Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers;
+using Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout;
 using Lykke.Sdk;
 using Lykke.Sdk.Health;
 
@@ -37,17 +38,17 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
 
             builder.RegisterChaosKitty(_settings.ChaosKitty);
 
-            builder.Register(p => new FinishedOperationsCleanupPeriodicalHandler(
+            builder.Register(p => new FinishedCashoutCleanupPeriodicalHandler(
                     timerPeriod: _settings.ActiveOperations.CleanupTimerPeriod, 
                     operationAgeToCleanup: _settings.ActiveOperations.OperationAgeToCleanup,
                     logFactory: p.Resolve<ILogFactory>(), 
-                    activeOperationsRepository: p.Resolve<IActiveOperationsRepository>()))
+                    activeCashoutRepository: p.Resolve<IActiveCashoutRepository>()))
                 .As<IStartable>()
                 .As<IStopable>()
                 .SingleInstance();
 
 
-            builder.RegisterType<RegisterUnfinishedOperationDurationPeriodicalHandler>()
+            builder.RegisterType<RegisterUnfinishedCashoutDurationPeriodicalHandler>()
                 .WithParameter(TypedParameter.From(_settings.ActiveOperations.RegisterUnifinishedOperationDurationTimerPeriod))
                 .As<IStartable>()
                 .As<IStopable>()
@@ -55,7 +56,7 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
 
 
 
-            builder.RegisterType<RegisterDurationFromLastFinishedCashoutPeriodicalHandler>()
+            builder.RegisterType<RegisterDurationFromLastCashoutPeriodicalHandler>()
                 .WithParameter(TypedParameter.From(_settings.ActiveOperations.RegisterUnifinishedOperationDurationTimerPeriod))
                 .As<IStartable>()
                 .As<IStopable>()

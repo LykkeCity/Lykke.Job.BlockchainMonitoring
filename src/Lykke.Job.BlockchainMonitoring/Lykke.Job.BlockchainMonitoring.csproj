@@ -25,6 +25,7 @@
     <PackageReference Include="Lykke.Messaging.RabbitMq" Version="2.1.0" />
     <PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.6.4" />
     <PackageReference Include="Lykke.Sdk" Version="5.3.1" />
+    <PackageReference Include="Lykke.Service.Assets.Client" Version="5.0.3" />
     <PackageReference Include="Lykke.SettingsReader" Version="4.1.1" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.4.1" />
@@ -42,6 +43,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers" />
-    <Folder Include="Workflow\Events\" />
   </ItemGroup>
 </Project>

@@ -10,19 +10,22 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
     public class SetLastFinishedCashoutMomentCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
-        private readonly ILastFinishedCashoutMomentRepository _lastFinishedCashoutMomentRepository;
+        private readonly ILastCashoutMomentRepository _lastCashoutMomentRepository;
 
         public SetLastFinishedCashoutMomentCommandHandler(IChaosKitty chaosKitty, 
-            ILastFinishedCashoutMomentRepository lastFinishedCashoutMomentRepository)
+            ILastCashoutMomentRepository lastCashoutMomentRepository)
         {
             _chaosKitty = chaosKitty;
-            _lastFinishedCashoutMomentRepository = lastFinishedCashoutMomentRepository;
+            _lastCashoutMomentRepository = lastCashoutMomentRepository;
         }
 
         [UsedImplicitly]
         public async Task<CommandHandlingResult> Handle(SetLastFinishedCashoutMomentCommand command, IEventPublisher publisher)
         {
-            await _lastFinishedCashoutMomentRepository.SetLastMomentAsync(command.AssetId, command.Finished, command.OperationId);
+            await _lastCashoutMomentRepository.SetLastMomentAsync(command.AssetId, 
+                command.AssetMetricId,
+                command.Finished, 
+                command.OperationId);
 
             _chaosKitty.Meow(command.OperationId);
 

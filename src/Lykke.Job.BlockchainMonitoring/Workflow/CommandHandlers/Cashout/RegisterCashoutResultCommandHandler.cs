@@ -22,7 +22,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
         public async Task<CommandHandlingResult> Handle(RegisterCashoutFailedCommand command, IEventPublisher publisher)
         {
             await _metricPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Fail,
-                command.AssetId,
+                command.AssetMetricId,
                 MetricOperationType.Cashout,
                 command.OperationId);
 
@@ -35,7 +35,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout
         public async Task<CommandHandlingResult> Handle(RegisterCashoutCompletedCommand command, IEventPublisher publisher)
         {
             await _metricPublishAdapterWithDeduplication.IncrementCounterAsync(MetricCounterType.Completed,
-                command.AssetId,
+                command.AssetMetricId,
                 MetricOperationType.Cashout,
                 command.OperationId);
 

@@ -16,6 +16,13 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollecti
 
         public string AssetId { get; set; }
 
+        public string BlockchainIntegrationLayerId { get; set; }
+
+        public string BlockchainIntegrationLayerAssetId { get; set; }
+
+        public decimal Amount { get; set; }
+
+
         #endregion
 
         #region Conversion
@@ -31,7 +38,10 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollecti
                 StartMoment = aggregate.StartMoment,
                 FinishMoment = aggregate.FinishMoment,
                 OperationId = aggregate.OperationId,
-                AssetId = aggregate.AssetId
+                AssetId = aggregate.AssetId,
+                Amount = aggregate.Amount,
+                BlockchainIntegrationLayerId = aggregate.BlockchainIntegrationLayerId,
+                BlockchainIntegrationLayerAssetId = aggregate.BlockchainIntegrationLayerAssetId
             };
         }
 
@@ -42,7 +52,10 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollecti
                 startMoment: StartMoment,
                 currentState: CurrentState,
                 assetId: AssetId,
-                finishMoment: FinishMoment);
+                finishMoment: FinishMoment,
+                blockchainIntegrationLayerAssetId: BlockchainIntegrationLayerAssetId,
+                blockchainIntegrationLayerId: BlockchainIntegrationLayerId,
+                amount: Amount);
         }
 
         #endregion

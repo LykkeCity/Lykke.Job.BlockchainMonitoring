@@ -6,6 +6,8 @@ using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
+using Lykke.Job.BlockchainMonitoring.Workflow.Events;
+using Lykke.Job.BlockchainMonitoring.Workflow.Events.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
 {
@@ -28,32 +30,57 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
             var aggregate = await _repository.GetOrAddAsync(evt.OperationId,
                 () => CashoutMetricsCollectionAggregate.StartNew(operationId: evt.OperationId,
                     startMoment: DateTime.UtcNow, 
-                    assetId: evt.AssetId));
+                    assetId: evt.AssetId,
+                    amount: evt.Amount));
 
             _chaosKitty.Meow(evt.OperationId);
 
             if (aggregate.CurrentState == CashoutMetricsCollectionAggregate.State.Started)
             {
-                sender.SendCommand(new RegisterCashoutAmountCommand
+                sender.SendCommand(new RetrieveAssetInfoCommand
                     {
-                        Amount = evt.Amount,
-                        AssetId = evt.AssetId,
+                        AssetId = aggregate.AssetId,
                         OperationId = aggregate.OperationId
-                    },
+                    }, 
                     BoundedContext);
-
-
-                sender.SendCommand(new SetActiveOperationCommand
-                {
-                    OperationId = aggregate.OperationId,
-                    AssetId = aggregate.AssetId,
-                    StartedAt = aggregate.StartMoment
-                }, BoundedContext);
             }
         }
 
         [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, ICommandSender sender)
+        private async Task Handle(AssetInfoRetrievedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.TryGetAsync(evt.OperationId);
+
+            if(aggregate.OnAssetInfoRetrieved(evt.BlockchainIntegrationLayerId,
+                evt.BlockchainIntegrationLayerAssetId))
+            {
+                sender.SendCommand(new RegisterCashoutAmountCommand
+                    {
+                        Amount = aggregate.Amount,
+                        AssetMetricId = aggregate.AssetMetricId,
+                        OperationId = aggregate.OperationId
+                    },
+                    BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                sender.SendCommand(new SetActiveOperationCommand
+                {
+                    OperationId = aggregate.OperationId,
+                    AssetMetricId = aggregate.AssetMetricId,
+                    AssetId = aggregate.AssetId,
+                    StartedAt = aggregate.StartMoment
+                }, BoundedContext);
+                
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
+
+        [UsedImplicitly]
+        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, 
+            ICommandSender sender)
         {
             var aggregate = await _repository.TryGetAsync(evt.OperationId);
 
@@ -67,7 +94,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
             {
                 sender.SendCommand(new RegisterCashoutDurationCommand
                     {
-                        AssetId = evt.AssetId,
+                        AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId,
                         Started = aggregate.StartMoment,
                         Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
@@ -78,25 +105,24 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
 
                 sender.SendCommand(new RegisterCashoutCompletedCommand
                     {
-                        AssetId = evt.AssetId,
+                        AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId
                     }, BoundedContext);
 
-
                 _chaosKitty.Meow(evt.OperationId);
 
-                sender.SendCommand(new SetActiveOperationFinishedCommand
+                sender.SendCommand(new SetActiveCashoutFinishedCommand
                 {
                     OperationId = aggregate.OperationId
                 }, BoundedContext);
-
-
+                
                 _chaosKitty.Meow(evt.OperationId);
 
                 sender.SendCommand(new SetLastFinishedCashoutMomentCommand
                 {
                     OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
+                    AssetMetricId = aggregate.AssetMetricId,
                     Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
                 }, BoundedContext);
 
@@ -105,7 +131,8 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
         }
         
         [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
+        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, 
+            ICommandSender sender)
         {
             var aggregate = await _repository.TryGetAsync(evt.OperationId);
 
@@ -119,7 +146,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
             {
                 sender.SendCommand(new RegisterCashoutDurationCommand
                     {
-                        AssetId = evt.AssetId,
+                        AssetMetricId = evt.AssetId,
                         OperationId = aggregate.OperationId,
                         Started = aggregate.StartMoment,
                         Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
@@ -130,13 +157,13 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
 
                 sender.SendCommand(new RegisterCashoutFailedCommand
                 {
-                    AssetId = evt.AssetId,
+                    AssetMetricId = aggregate.AssetMetricId,
                     OperationId = aggregate.OperationId
                 }, BoundedContext);
 
                 _chaosKitty.Meow(evt.OperationId);
 
-                sender.SendCommand(new SetActiveOperationFinishedCommand
+                sender.SendCommand(new SetActiveCashoutFinishedCommand
                 {
                     OperationId = aggregate.OperationId
                 }, BoundedContext);
@@ -147,6 +174,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                 {
                     OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
+                    AssetMetricId = aggregate.AssetMetricId,
                     Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
                 }, BoundedContext);
 

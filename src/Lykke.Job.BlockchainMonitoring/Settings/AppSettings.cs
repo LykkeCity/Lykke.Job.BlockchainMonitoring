@@ -1,4 +1,5 @@
-﻿using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
+﻿using JetBrains.Annotations;
+using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
 using Lykke.Job.BlockchainMonitoring.Settings.SlackNotifications;
 using Lykke.SettingsReader.Attributes;
 
@@ -12,5 +13,8 @@ namespace Lykke.Job.BlockchainMonitoring.Settings
 
         [Optional]
         public MonitoringServiceClientSettings MonitoringServiceClient { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public AssetServiceClientSettings AssetsServiceClient { get; set; }
     }
 }

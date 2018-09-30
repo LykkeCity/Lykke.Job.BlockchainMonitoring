@@ -7,26 +7,26 @@ using Common;
 using Lykke.Common.Log;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 
-namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
+namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
 {
-    public class FinishedOperationsCleanupPeriodicalHandler:IStopable, IStartable
+    public class FinishedCashoutCleanupPeriodicalHandler:IStopable, IStartable
     {
         private readonly ITimerTrigger _timer;
-        private readonly IActiveOperationsRepository _activeOperationsRepository;
+        private readonly IActiveCashoutRepository _activeCashoutRepository;
         private readonly TimeSpan _operationAgeToCleanup;
 
-        public FinishedOperationsCleanupPeriodicalHandler(
+        public FinishedCashoutCleanupPeriodicalHandler(
             TimeSpan timerPeriod,
             TimeSpan operationAgeToCleanup,
             ILogFactory logFactory, 
-            IActiveOperationsRepository activeOperationsRepository)
+            IActiveCashoutRepository activeCashoutRepository)
         {
-            _activeOperationsRepository = activeOperationsRepository;
+            _activeCashoutRepository = activeCashoutRepository;
 
             _operationAgeToCleanup = operationAgeToCleanup;
 
             _timer = new TimerTrigger(
-                nameof(FinishedOperationsCleanupPeriodicalHandler),
+                nameof(FinishedCashoutCleanupPeriodicalHandler),
                 timerPeriod,
                 logFactory);
 
@@ -53,11 +53,11 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers
             TimerTriggeredHandlerArgs args,
             CancellationToken cancellationToken)
         {
-            var allOperations = await _activeOperationsRepository.GetAllAsync();
+            var allOperations = await _activeCashoutRepository.GetAllAsync();
 
             foreach (var op in allOperations.Where(p => p.finished && (DateTime.UtcNow - p.startedAt) >= _operationAgeToCleanup))
             {
-                await _activeOperationsRepository.DeleteIfExistAsync(op.operationId);
+                await _activeCashoutRepository.DeleteIfExistAsync(op.operationId);
             }
         }
     }

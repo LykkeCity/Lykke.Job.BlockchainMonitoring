@@ -5,9 +5,11 @@ using Lykke.AzureStorage.Tables;
 
 namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.LastFinishedCashoutMoment
 {
-    public class LastFinishedCashoutMomentEntity: AzureTableEntity
+    public class LastCashoutMomentEntity: AzureTableEntity
     {
         public string AssetId { get; set; }
+
+        public string AssetMetricId { get; set; }
 
         public DateTime Moment { get; set; }
 
