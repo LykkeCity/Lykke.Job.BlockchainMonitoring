@@ -1,9 +1,34 @@
 BlockchainMonitoringJob:
-  Db:
-    LogsConnString:
-      settings-key: LogsConnString
-      types:
-        - AzureTableStorage
+    Cqrs:
+        RabbitConnectionString:
+            settings-key: CqrsRabbitConnString
+            types:
+                - RabbitMq
+        RetryDelay:        
+            settings-key: BlockchainMonitoringJob-Cqrs-RetryDelay
+    Db:
+        DataConnString:
+            settings-key: BlockchainMonitoringJob-DataConnString
+            types:
+                - AzureTableStorage
+        LogsConnString:
+            settings-key: LogsConnString
+            types:
+                - AzureTableStorage
+    ChaosKitty:
+        StateOfChaos:
+            settings-key: BlockchainMonitoringJob-ChaosKittyState
+    PrometheusPushGatewayUrl:
+        settings-key: BlockchainMonitoringJob-PrometheusPushGatewayUrl      
+    ActiveOperations:
+        OperationAgeToCleanup:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-OperationAgeToCleanup    
+        CleanupTimerPeriod:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-CleanupTimerPeriod 
+        RegisterUnifinishedOperationDurationTimerPeriod:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-RegisterUnifinishedOperationDurationTimerPeriod        
+        RegisterDurationFromLastFinishedCashoutTimerPeriod:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-RegisterDurationFromLastFinishedCashoutTimerPeriod  
 SlackNotifications:
     AzureQueue:
         ConnectionString:
@@ -15,4 +40,7 @@ SlackNotifications:
 MonitoringServiceClient:
     MonitoringServiceUrl:
         settings-key: MonitoringServiceUrl
+AssetsServiceClient:
+    ServiceUrl: 
+        settings-key: AssetsServiceUrl
 
