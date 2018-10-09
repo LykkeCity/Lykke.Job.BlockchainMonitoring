@@ -16,5 +16,11 @@ namespace Lykke.Job.BlockchainMonitoring.Settings.JobSettings
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public TimeSpan RegisterDurationFromLastFinishedCashoutTimerPeriod { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public TimeSpan OperationTimeout { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public TimeSpan OperationTimeoutTimerPeriod { get; set; }
     }
 }

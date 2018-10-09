@@ -29,6 +29,10 @@ BlockchainMonitoringJob:
             settings-key: BlockchainMonitoringJob-ActiveOperations-RegisterUnifinishedOperationDurationTimerPeriod        
         RegisterDurationFromLastFinishedCashoutTimerPeriod:
             settings-key: BlockchainMonitoringJob-ActiveOperations-RegisterDurationFromLastFinishedCashoutTimerPeriod  
+        OperationTimeout:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-OperationTimeout        
+        OperationTimeoutTimerPeriod:
+            settings-key: BlockchainMonitoringJob-ActiveOperations-OperationTimeoutTimerPeriod 
 SlackNotifications:
     AzureQueue:
         ConnectionString:

@@ -6,26 +6,30 @@ using Autofac;
 using Common;
 using Common.Log;
 using Lykke.Common.Log;
+using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
+using Lykke.Job.BlockchainMonitoring.Workflow.BoundedContexts;
+using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
 {
-    public class FinishedCashoutCleanupPeriodicalHandler:IStopable, IStartable
+    public class FinishTimeoutedCashoutsPeriodicHandler:IStartable, IStopable
     {
         private readonly ITimerTrigger _timer;
         private readonly IActiveCashoutRepository _activeCashoutRepository;
-        private readonly TimeSpan _operationAgeToCleanup;
+        private readonly TimeSpan _operationTimeout;
         private readonly ILog _log;
+        private readonly ICqrsEngine _cqrsEngine;
 
-        public FinishedCashoutCleanupPeriodicalHandler(
+        public FinishTimeoutedCashoutsPeriodicHandler(IActiveCashoutRepository activeCashoutRepository, 
+            TimeSpan operationTimeout,
             TimeSpan timerPeriod,
-            TimeSpan operationAgeToCleanup,
-            ILogFactory logFactory, 
-            IActiveCashoutRepository activeCashoutRepository)
+            ILogFactory logFactory,
+            ICqrsEngine cqrsEngine)
         {
             _activeCashoutRepository = activeCashoutRepository;
-
-            _operationAgeToCleanup = operationAgeToCleanup;
+            _operationTimeout = operationTimeout;
+            _cqrsEngine = cqrsEngine;
             _log = logFactory.CreateLog(this);
 
             _timer = new TimerTrigger(
@@ -36,10 +40,9 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
             _timer.Triggered += Execute;
         }
 
-
         public void Start()
         {
-            _log.Info($"Starting {nameof(FinishedCashoutCleanupPeriodicalHandler)}");
+            _log.Info($"Starting {nameof(FinishTimeoutedCashoutsPeriodicHandler)}");
             _timer.Start();
         }
 
@@ -58,10 +61,17 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
             CancellationToken cancellationToken)
         {
             var allOperations = await _activeCashoutRepository.GetAllAsync();
-
-            foreach (var op in allOperations.Where(p => p.finished && (DateTime.UtcNow - p.startedAt) >= _operationAgeToCleanup))
+            
+            foreach (var operation in allOperations.Where(p => DateTime.UtcNow - p.startedAt > _operationTimeout))
             {
-                await _activeCashoutRepository.DeleteIfExistAsync(op.operationId);
+                _log.Warning("Finishing operation after timeout", context: operation);
+
+                _cqrsEngine.SendCommand(new SetActiveCashoutFinishedCommand
+                    {
+                        OperationId = operation.operationId
+                    },
+                    CashoutMetricsCollectionBoundedContext.Name,
+                    CashoutMetricsCollectionBoundedContext.Name);
             }
         }
     }

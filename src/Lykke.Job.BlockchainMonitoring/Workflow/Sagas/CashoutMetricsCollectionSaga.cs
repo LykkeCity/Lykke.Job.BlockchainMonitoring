@@ -5,8 +5,8 @@ using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainMonitoring.Domain;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
+using Lykke.Job.BlockchainMonitoring.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
-using Lykke.Job.BlockchainMonitoring.Workflow.Events;
 using Lykke.Job.BlockchainMonitoring.Workflow.Events.Cashout;
 
 namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
@@ -15,9 +15,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
     {
         private readonly ICashoutMetricsCollectionRepository _repository;
         private readonly IChaosKitty _chaosKitty;
-
-        public const string BoundedContext = "bcn-integration.cashout-metrics";
-
+        
         public CashoutMetricsCollectionSaga(ICashoutMetricsCollectionRepository repository, IChaosKitty chaosKitty)
         {
             _repository = repository;
@@ -41,8 +39,8 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     {
                         AssetId = aggregate.AssetId,
                         OperationId = aggregate.OperationId
-                    }, 
-                    BoundedContext);
+                    },
+                    CashoutMetricsCollectionBoundedContext.Name);
             }
         }
 
@@ -60,7 +58,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                         AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId
                     },
-                    BoundedContext);
+                    CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -70,7 +68,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     AssetMetricId = aggregate.AssetMetricId,
                     AssetId = aggregate.AssetId,
                     StartedAt = aggregate.StartMoment
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
                 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -99,7 +97,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                         Started = aggregate.StartMoment,
                         Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
                     },
-                    BoundedContext);
+                    CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -107,14 +105,14 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     {
                         AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId
-                    }, BoundedContext);
+                    }, CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
                 sender.SendCommand(new SetActiveCashoutFinishedCommand
                 {
                     OperationId = aggregate.OperationId
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
                 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -124,7 +122,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     AssetId = aggregate.AssetId,
                     AssetMetricId = aggregate.AssetMetricId,
                     Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
 
                 await _repository.SaveAsync(aggregate);
             }
@@ -151,7 +149,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                         Started = aggregate.StartMoment,
                         Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
                     },
-                    BoundedContext);
+                    CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -159,14 +157,14 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                 {
                     AssetMetricId = aggregate.AssetMetricId,
                     OperationId = aggregate.OperationId
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
                 sender.SendCommand(new SetActiveCashoutFinishedCommand
                 {
                     OperationId = aggregate.OperationId
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -176,7 +174,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
                     AssetId = aggregate.AssetId,
                     AssetMetricId = aggregate.AssetMetricId,
                     Finished = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment))
-                }, BoundedContext);
+                }, CashoutMetricsCollectionBoundedContext.Name);
 
                 await _repository.SaveAsync(aggregate);
             }

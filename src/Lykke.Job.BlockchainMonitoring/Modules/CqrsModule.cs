@@ -6,9 +6,9 @@ using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
 using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainMonitoring.Settings.JobSettings;
+using Lykke.Job.BlockchainMonitoring.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainMonitoring.Workflow.CommandHandlers.Cashout;
 using Lykke.Job.BlockchainMonitoring.Workflow.Commands.Cashout;
-using Lykke.Job.BlockchainMonitoring.Workflow.Events;
 using Lykke.Job.BlockchainMonitoring.Workflow.Events.Cashout;
 using Lykke.Job.BlockchainMonitoring.Workflow.Sagas;
 using Lykke.Messaging;
@@ -91,7 +91,7 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  "RabbitMq",
                  SerializationFormat.MessagePack,
                  environment: "lykke")),
-             Register.BoundedContext(CashoutMetricsCollectionSaga.BoundedContext)
+             Register.BoundedContext(CashoutMetricsCollectionBoundedContext.Name)
                  .FailedCommandRetryDelay(defaultRetryDelay)
 
                  .ListeningCommands(typeof(RetrieveAssetInfoCommand))
@@ -119,6 +119,7 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
 
                  .ListeningCommands(typeof(SetActiveCashoutFinishedCommand))
                  .On(defaultRoute)
+                 .WithLoopback()
                  .WithCommandsHandler<SetActiveCashoutFinishedCommandHandler>()
 
                  .ListeningCommands(typeof(SetLastFinishedCashoutMomentCommand))
@@ -128,21 +129,21 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
                  .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 
-             Register.Saga<CashoutMetricsCollectionSaga>($"{CashoutMetricsCollectionSaga.BoundedContext}.saga")
+             Register.Saga<CashoutMetricsCollectionSaga>($"{CashoutMetricsCollectionBoundedContext.Name}.saga")
                  .ListeningEvents(
                      typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent))
                  .From(BlockchainCashoutProcessorBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RetrieveAssetInfoCommand))
-                 .To(CashoutMetricsCollectionSaga.BoundedContext)
+                 .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
 
                  .ListeningEvents(typeof(AssetInfoRetrievedEvent))
-                 .From(CashoutMetricsCollectionSaga.BoundedContext)
+                 .From(CashoutMetricsCollectionBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RegisterCashoutAmountCommand),
                      typeof(SetActiveOperationCommand))
-                 .To(CashoutMetricsCollectionSaga.BoundedContext)
+                 .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
 
                  .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
@@ -152,7 +153,7 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                      typeof(RegisterCashoutCompletedCommand),
                      typeof(SetActiveCashoutFinishedCommand), 
                      typeof(SetLastFinishedCashoutMomentCommand))
-                 .To(CashoutMetricsCollectionSaga.BoundedContext)
+                 .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
 
                  .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent))
@@ -162,7 +163,7 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                      typeof(RegisterCashoutFailedCommand), 
                      typeof(SetActiveCashoutFinishedCommand), 
                      typeof(SetLastFinishedCashoutMomentCommand))
-                 .To(CashoutMetricsCollectionSaga.BoundedContext)
+                 .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
                 );
         }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Common;
+using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Job.BlockchainMonitoring.Domain.Repositories;
 using Lykke.Job.BlockchainMonitoring.Domain.Services;
@@ -15,6 +16,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
         private readonly ITimerTrigger _timer;
         private readonly IActiveCashoutRepository _activeCashoutRepository;
         private readonly IMetricPublishAdapter _metrickPublishAdapter;
+        private readonly ILog _log;
 
         public RegisterUnfinishedCashoutDurationPeriodicalHandler(IActiveCashoutRepository activeCashoutRepository, 
             TimeSpan timerPeriod, 
@@ -23,6 +25,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
         {
             _activeCashoutRepository = activeCashoutRepository;
             _metrickPublishAdapter = metrickPublishAdapter;
+            _log = logFactory.CreateLog(this);
 
             _timer = new TimerTrigger(
                 nameof(FinishedCashoutCleanupPeriodicalHandler),
@@ -35,6 +38,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
 
         public void Start()
         {
+            _log.Info($"Starting {nameof(RegisterUnfinishedCashoutDurationPeriodicalHandler)}");
             _timer.Start();
         }
 
