@@ -12,7 +12,7 @@ BlockchainMonitoringJob:
             types:
                 - AzureTableStorage
         LogsConnString:
-            settings-key: LogsConnString
+            settings-key: BlockchainMonitoringJob-LogsConnString
             types:
                 - AzureTableStorage
     ChaosKitty:
