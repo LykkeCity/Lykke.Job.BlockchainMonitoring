@@ -13,9 +13,9 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 {
     public class ActiveCashoutRepository: IActiveCashoutRepository
     {
-        private readonly INoSQLTableStorage<ActiceCashoutEntity> _storage;
+        private readonly INoSQLTableStorage<ActiveCashoutEntity> _storage;
 
-        private ActiveCashoutRepository(INoSQLTableStorage<ActiceCashoutEntity> storage)
+        private ActiveCashoutRepository(INoSQLTableStorage<ActiveCashoutEntity> storage)
         {
             _storage = storage;
         }
@@ -23,13 +23,13 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
         public static IActiveCashoutRepository Create(IReloadingManager<string> connStringManager, 
             ILogFactory logFactory)
         {
-            return new ActiveCashoutRepository(AzureTableStorage<ActiceCashoutEntity>.Create(connStringManager,
+            return new ActiveCashoutRepository(AzureTableStorage<ActiveCashoutEntity>.Create(connStringManager,
                 "MonitoringActiveCashouts", logFactory));
         }
 
         public async Task InsertAsync(Guid operationId, string assetId, string assetMetricId, DateTime startedAt)
         {
-            await _storage.InsertOrReplaceAsync(new ActiceCashoutEntity
+            await _storage.InsertOrReplaceAsync(new ActiveCashoutEntity
             {
                 OperationId = operationId,
                 AssetId = assetId,
@@ -49,7 +49,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 
         public Task SetFinishedAsync(Guid operationId)
         {
-           return _storage.ReplaceAsync(BuildPartitionKey(operationId), BuildRowKey(operationId), entity => {
+           return _storage.ReplaceAsync(BuildPartitionKey(operationId), BuildRowKey(), entity => {
                 entity.Finished = true;
 
                 return entity;
@@ -58,18 +58,18 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
 
         public Task DeleteIfExistAsync(Guid operationId)
         {
-            return _storage.DeleteIfExistAsync(BuildPartitionKey(operationId), BuildRowKey(operationId));
+            return _storage.DeleteIfExistAsync(BuildPartitionKey(operationId), BuildRowKey());
         }
 
         private string BuildPartitionKey(Guid operationId)
         {
-            return operationId.ToString().CalculateHexHash32(3);
+            return operationId.ToString();
         }
 
 
-        private string BuildRowKey(Guid operationId)
+        private string BuildRowKey()
         {
-            return operationId.ToString("D");
+            return "";
         }
     }
 }

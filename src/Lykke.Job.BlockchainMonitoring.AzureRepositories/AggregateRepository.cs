@@ -27,7 +27,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories
         public async Task<TAggregate> GetOrAddAsync(Guid aggregateId, Func<TAggregate> newAggregateFactory)
         {
             var partitionKey = AggregateKeysBuilder.BuildPartitionKey(aggregateId);
-            var rowKey = AggregateKeysBuilder.BuildRowKey(aggregateId);
+            var rowKey = AggregateKeysBuilder.BuildRowKey();
 
             var startedEntity = await _storage.GetOrInsertAsync(
                 partitionKey,
@@ -57,7 +57,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories
         public async Task<TAggregate> TryGetAsync(Guid aggregateId)
         {
             var partitionKey = AggregateKeysBuilder.BuildPartitionKey(aggregateId);
-            var rowKey = AggregateKeysBuilder.BuildRowKey(aggregateId);
+            var rowKey = AggregateKeysBuilder.BuildRowKey();
 
             var entity = await _storage.GetDataAsync(partitionKey, rowKey);
             

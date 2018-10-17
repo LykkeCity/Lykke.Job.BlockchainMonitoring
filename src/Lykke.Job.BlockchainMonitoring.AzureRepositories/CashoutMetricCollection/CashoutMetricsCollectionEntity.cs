@@ -33,7 +33,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.CashoutMetricCollecti
             {
                 ETag = aggregate.Version,
                 PartitionKey = AggregateKeysBuilder.BuildPartitionKey(aggregate.OperationId),
-                RowKey = AggregateKeysBuilder.BuildRowKey(aggregate.OperationId),
+                RowKey = AggregateKeysBuilder.BuildRowKey(),
                 CurrentState = aggregate.CurrentState,
                 StartMoment = aggregate.StartMoment,
                 FinishMoment = aggregate.FinishMoment,

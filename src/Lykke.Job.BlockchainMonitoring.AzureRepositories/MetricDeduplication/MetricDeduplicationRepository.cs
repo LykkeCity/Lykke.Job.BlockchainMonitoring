@@ -32,24 +32,23 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.MetricDeduplication
                 OperationId = operationId,
                 MetricType = metricType.ToString(),
                 PartitionKey = BuildPartitionKey(metricType, operationId),
-                RowKey = BuildRowKey(operationId)
+                RowKey = BuildRowKey()
             });
         }
 
         public async Task<bool> IsExistsAsync(Guid operationId, Enum metricType)
         {
-            return await _storage.GetDataAsync(BuildPartitionKey(metricType, operationId),
-                       BuildRowKey(operationId)) != null;
+            return (await _storage.GetDataAsync(BuildPartitionKey(metricType, operationId), BuildRowKey())) != null;
         }
 
-        private string BuildRowKey(Guid operationId)
+        private string BuildRowKey()
         {
-            return $"{operationId:D}";
+            return "";
         }
         
         private string BuildPartitionKey(Enum metricType, Guid operationId)
         {
-            return $"{metricType}_{operationId.ToString().CalculateHexHash32()}";
+            return $"{metricType}_{operationId.ToString()}";
         }
     }
 }

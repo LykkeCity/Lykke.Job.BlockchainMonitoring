@@ -46,18 +46,18 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.LastFinishedCashoutMo
                 Moment = moment,
                 OperationId = operationId,
                 PartitionKey = BuildPartitionKey(assetId),
-                RowKey = BuildRowKey(assetId)
+                RowKey = BuildRowKey()
             }, p => p.Moment < moment);
         }
 
         private string BuildPartitionKey(string assetId)
         {
-            return assetId.CalculateHexHash32(3);
+            return assetId;
         }
 
-        private string BuildRowKey(string assetId)
+        private string BuildRowKey()
         {
-            return assetId;
+            return "";
         }
     }
 }

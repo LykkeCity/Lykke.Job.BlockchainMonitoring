@@ -7,15 +7,12 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories
     {
         public static string BuildPartitionKey(Guid aggregateId)
         {
-            // Use hash to distribute all records to the different partitions
-            var hash = aggregateId.ToString().CalculateHexHash32(3);
-
-            return hash;
+            return aggregateId.ToString();
         }
 
-        public static string BuildRowKey(Guid aggregateId)
+        public static string BuildRowKey()
         {
-            return $"{aggregateId:D}";
+            return "";
         }
     }
 }
