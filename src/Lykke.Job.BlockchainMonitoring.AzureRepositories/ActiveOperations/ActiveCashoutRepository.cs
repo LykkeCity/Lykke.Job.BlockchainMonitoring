@@ -36,7 +36,7 @@ namespace Lykke.Job.BlockchainMonitoring.AzureRepositories.ActiveOperations
                 AssetMetricId = assetMetricId,
                 Finished = false,
                 PartitionKey = BuildPartitionKey(operationId),
-                RowKey = BuildRowKey(operationId),
+                RowKey = BuildRowKey(),
                 StartedAt = startedAt
             }, p => false);
         }
