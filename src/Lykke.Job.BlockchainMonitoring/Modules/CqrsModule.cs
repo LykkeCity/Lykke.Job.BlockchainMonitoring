@@ -131,7 +131,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
 
              Register.Saga<CashoutMetricsCollectionSaga>($"{CashoutMetricsCollectionBoundedContext.Name}.saga")
                  .ListeningEvents(
-                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent))
+                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent),
+                     typeof(BlockchainCashoutProcessor.Contract.Events.BatchedCashoutStartedEvent))
                  .From(BlockchainCashoutProcessorBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RetrieveAssetInfoCommand))
@@ -146,7 +147,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
 
-                 .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
+                 .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent),
+                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchCompletedEvent))
                  .From(BlockchainCashoutProcessorBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RegisterCashoutDurationCommand), 
@@ -156,7 +158,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  .To(CashoutMetricsCollectionBoundedContext.Name)
                  .With(commandsPipeline)
 
-                 .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent))
+                 .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
+                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent))
                  .From(BlockchainCashoutProcessorBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RegisterCashoutDurationCommand), 
