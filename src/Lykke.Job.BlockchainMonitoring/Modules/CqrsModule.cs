@@ -148,7 +148,8 @@ namespace Lykke.Job.BlockchainMonitoring.Modules
                  .With(commandsPipeline)
 
                  .ListeningEvents(typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent),
-                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchCompletedEvent))
+                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchCompletedEvent),
+                     typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchFailedEvent))
                  .From(BlockchainCashoutProcessorBoundedContext.Name)
                  .On(defaultRoute)
                  .PublishingCommands(typeof(RegisterCashoutDurationCommand), 

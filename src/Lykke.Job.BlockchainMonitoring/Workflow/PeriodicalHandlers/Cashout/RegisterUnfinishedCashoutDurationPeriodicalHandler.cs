@@ -56,7 +56,8 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.PeriodicalHandlers.Cashout
             TimerTriggeredHandlerArgs args,
             CancellationToken cancellationToken)
         {
-            var activeOperations = (await _activeCashoutRepository.GetAllAsync()).ToList();
+            var activeOperations =
+                (await _activeCashoutRepository.GetAllAsync()).ToList().Where(p => p.assetId == "BTC"&&!p.finished);
 
             foreach (var operationsByAssetId in activeOperations.GroupBy(p => p.assetId))
             {
