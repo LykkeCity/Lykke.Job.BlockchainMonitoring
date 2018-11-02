@@ -150,15 +150,16 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
 
                 if (isFailed)
                 {
-                    sender.SendCommand(new RegisterCashoutCompletedCommand
+                    sender.SendCommand(new RegisterCashoutFailedCommand
                     {
                         AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId
                     }, CashoutMetricsCollectionBoundedContext.Name);
+
                 }
                 else
                 {
-                    sender.SendCommand(new RegisterCashoutFailedCommand
+                    sender.SendCommand(new RegisterCashoutCompletedCommand
                     {
                         AssetMetricId = aggregate.AssetMetricId,
                         OperationId = aggregate.OperationId
