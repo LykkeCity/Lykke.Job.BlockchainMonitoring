@@ -33,7 +33,7 @@ namespace Lykke.Job.BlockchainMonitoring.Workflow.Sagas
         [UsedImplicitly]
         private Task Handle(BlockchainCashoutProcessor.Contract.Events.BatchedCashoutStartedEvent evt, ICommandSender sender)
         {
-            return OnStarted(evt.OperationId, DateTime.UtcNow, evt.AssetId, evt.Amount, sender);
+            return OnStarted(evt.BatchId, DateTime.UtcNow, evt.AssetId, evt.Amount, sender);
         }
 
         private async Task OnStarted(
